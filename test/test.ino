@@ -2,7 +2,7 @@
 
 z_port zaber1;
 string command;
-string reply;
+za_reply reply;
 
 void setup() {
   Serial.begin(9600);
@@ -16,6 +16,17 @@ void loop() {
       command = Serial.read();
       za_send(zaber1, command);
       za_receive(zaber1, reply);
-      Serial.println(reply);
+      Serial.print(reply.message_type);
+      Serial.print(reply.device_address);
+      Serial.print(" ");
+      Serial.print(reply.axis_number);
+      Serial.print(" ");
+      Serial.print(reply.reply_flags);
+      Serial.print(" ");
+      Serial.print(reply.device_status);
+      Serial.print(" ");
+      Serial.print(reply.warning_flags);
+      Serial.print(" ");
+      Serial.println(reply.response_data);
     }
 }
