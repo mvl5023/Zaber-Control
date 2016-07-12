@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 
 struct reply {
   String fullResponse;
@@ -31,20 +31,24 @@ String GetPos = "get pos";
 int RXpin = 11;
 int TXpin = 4;
 
-SoftwareSerial rs232(RXpin, TXpin);   //RX, TX
+//SoftwareSerial rs232(RXpin, TXpin);   //RX, TX
  
 void setup()
 {
-  rs232.begin(115200);
+  Serial.begin(115200);
 }
 
 void loop()
 {
   delay(1000);
-  requestCommand(deviceNum, Home, " ");
+  Serial.println("/renumber");
+  pollUntilIdle(deviceNum);
+  //requestCommand(deviceNum, Home, " ");
+  Serial.println("/home");
   pollUntilIdle(deviceNum);
   
   requestCommand(deviceNum, SetMaxspeed, "50000"); 
+  requestCommand("2", SetMaxspeed, "50000"); 
  
   while (true)
   {
@@ -70,9 +74,9 @@ String mm(float mmValue)
  
 struct reply requestCommand(String device, String command, String data)
 {
-  rs232.println("/" + device + " " + command + " " + data);
+  Serial.println("/" + device + " " + command + " " + data);
   
-  String fullResponse = rs232.readStringUntil('\n');
+  String fullResponse = Serial.readStringUntil('\n');
   
   String messageType = fullResponse.substring(0,1);
   String nn = fullResponse.substring(1,3);
