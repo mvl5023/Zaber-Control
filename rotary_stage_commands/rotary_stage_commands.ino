@@ -1,4 +1,16 @@
+/*   Testing movement commands of Zaber T-series rotational stages
+ *      
+ *   Michael Lipski
+ *   AOPL
+ *   Summer 2016
+ *   
+ *   Used to test Arduino control of Zaber T-series rotational stages.  Includes function sendCommand, which is used in pyranometer tracker sketches.
+ */
+
 #include <SoftwareSerial.h>
+
+#include <zaberx.h>
+
 
 byte command[6];
 byte reply[6];
@@ -8,19 +20,12 @@ int renumber = 2;
 int moveAbs = 20;
 int moveRel = 21;
 int stopMove = 23;
-int speedSet = 42;    // Speed to target = 0.26367(V) degrees/sec (assuming 64 microstep resolution)
+int speedSet = 42;    // Speed to target = 0.00219727(V) degrees/sec (assuming 64 microstep resolution)
 int getPos = 60;
 int storePos = 16;    // Position can be stored in registers 0 to 15
 int returnPos = 17;
 int move2Pos = 18;
 int reset = 0;
-
-#define quad 4294967296
-long cubed = 16777216;
-long squared = 65536;
-
-float resolutionDeg = 0.000234375;
-float resolutionRad = 0.000004091;
 
 //On Mega, RX must be one of the following: pin 10-15, 50-53, A8-A15
 int RXpin = 3;
@@ -34,7 +39,9 @@ void setup()
   rs232.begin(9600);
   delay(2000);
   sendCommand(0, renumber, 0);
-  delay(2000);
+  delay(1000);
+  sendCommand(0, speedSet, 4551);   // Set speed to 10 degrees/sec
+  delay(1000);
   sendCommand(0, homer, 0);
   delay(5000);
 }
@@ -45,20 +52,6 @@ void loop()
   delay(2500);
   sendCommand(0, moveAbs, stepsD(20));
   delay(2500);
-}
-
-long stepsD(float degr)
-{
-  long stepValue;
-  stepValue = degr / resolutionDeg;
-  return stepValue;
-}
-
-long stepsR(float radis)
-{
-  long stepValue;
-  stepValue = radis / resolutionRad;
-  return stepValue;
 }
 
 void sendCommand(int device, int com, long data)
@@ -85,12 +78,7 @@ void sendCommand(int device, int com, long data)
    command[2] = byte(data);
    
    // Sending command to stage(s)
-   rs232.print(command[0]);
-   rs232.print(command[1]);
-   rs232.print(command[2]);
-   rs232.print(command[3]);
-   rs232.print(command[4]);
-   rs232.print(command[5]);
+   rs232.write(command, 6);
    delay(500);
    
    // Reading device reply
