@@ -16,7 +16,6 @@
 byte command[6];
 byte reply[6];
 byte buff[6];
-byte dumper;
 
 int axisX = 1;    // Device ID of azimuth stage
 int axisY = 1;     // Device ID of elevation stage
@@ -49,7 +48,8 @@ SoftwareSerial rs232(RXPin, TXPin);   //RX, TX
 void setup() 
 {
   Serial.begin(9600);
-  
+
+  // Sets the stages to use binary protocol
   rs232.begin(115200);
   delay(1000);  
   rs232.println("/tools setcomm 9600 1");
@@ -61,6 +61,7 @@ void setup()
   
 
   /*
+  // Sets the stages to use ASCII protocol
   rs232.begin(9600);
   delay(1000);
   replyData = sendCommand(1, 124, 115200);
@@ -114,6 +115,7 @@ long sendCommand(int device, int com, long data)
    unsigned long temp;
    unsigned long repData;
    long replyNeg;
+   byte dumper;
    
    // Building the six command bytes
    command[0] = byte(device);
@@ -140,7 +142,7 @@ long sendCommand(int device, int com, long data)
    // Clearing serial buffer
    while(rs232.available() > 0)
    {
-     rs232.readBytes(&dumper, 1);
+     rs232.readBytes(dumper, 1);
    }
    
    // Sending command to stage(s)
