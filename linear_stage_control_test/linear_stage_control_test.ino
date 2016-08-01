@@ -25,7 +25,6 @@ String renum = "renumber ";
 String comm;
 String reply;
 
-
 long posX = 0;
 long posY = 0;
 
@@ -75,10 +74,10 @@ void loop()
 
 void clearBuffer()
 {
-  byte dumper;
+  String dumper;
   while(rs232.available() > 0)
   {
-    rs232.readBytes(dumper, 1);
+    dumper = rs232.readString();
   }
 }
 
@@ -102,4 +101,5 @@ void getReply()
   Serial.println(reply);
   Serial.println(replyData);
 }
+
 

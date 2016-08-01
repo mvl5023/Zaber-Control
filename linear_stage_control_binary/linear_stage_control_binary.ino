@@ -49,14 +49,25 @@ SoftwareSerial rs232(RXPin, TXPin);   //RX, TX
 void setup() 
 {
   Serial.begin(9600);
+  
   rs232.begin(115200);
-  delay(1000);
+  delay(1000);  
   rs232.println("/tools setcomm 9600 1");
   delay(500);
   Serial.println(rs232.readStringUntil('\n'));
   delay(100);
   rs232.end();
   delay(200);
+  
+
+  /*
+  rs232.begin(9600);
+  delay(1000);
+  replyData = sendCommand(1, 124, 115200);
+  delay(100);
+  rs232.end();
+  */
+  
   rs232.begin(9600);
   delay(500);
 
@@ -142,8 +153,14 @@ long sendCommand(int device, int com, long data)
    {
      rs232.readBytes(reply, 6);
    }
-
+   
    repData = (cubed * reply[5]) + (squared * reply[4]) + (256 * reply[3]) + reply[2];
+
+   if(reply[4] == 1)
+   {
+     repData += 65536;
+   }
+   
    if(reply[5] > 127)
    {
      replyNeg = repData - quad;
