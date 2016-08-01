@@ -61,14 +61,25 @@ void loop()
   {
     comm = Serial.readStringUntil('\n');
     outData = mm(comm.toInt());
+    clearBuffer();
     sendCommand(axisX, moveAbs, outData);    
     getReply();
     delay(500);
   }
+  clearBuffer();
   rs232.println("/get pos");
-  delay(500);
+  delay(50);
   getReply();
   delay(3000);
+}
+
+void clearBuffer()
+{
+  byte dumper;
+  while(rs232.available() > 0)
+  {
+    rs232.readBytes(dumper, 1);
+  }
 }
 
 void sendCommand(String axis, String command, long data)
@@ -78,7 +89,7 @@ void sendCommand(String axis, String command, long data)
   outString = axis + command;
   outString += data;
   rs232.println(outString);
-  delay(100);
+  delay(50);
 }
 
 void getReply()

@@ -125,11 +125,13 @@ long sendCommand(int device, int com, long data)
    command[3] = byte(temp);
    data2 -= (256 * data2);
    command[2] = byte(data2);
-
+   
+   // Clearing serial buffer
    while(rs232.available() > 0)
    {
-     rs232.readBytes(dumper, 1);
+     rs232.readBytes(&dumper, 1);
    }
+   
    // Sending command to stage(s)
    rs232.write(command, 6);
 
