@@ -18,10 +18,10 @@ byte reply[6];
 byte buff[6];
 
 int axisX = 1;    // Device ID of azimuth stage
-int axisY = 1;     // Device ID of elevation stage
+int axisY = 2;     // Device ID of elevation stage
 
-long posX = 0;   // Variable which tracks the absolute position of the azimuth stage (in microsteps)
-long posY = 0;   // Variable which tracks the absolute position of the elevation stage (in microsteps)
+unsigned long posX = 0;   // Variable which tracks the absolute position of the azimuth stage (in microsteps)
+unsigned long posY = 0;   // Variable which tracks the absolute position of the elevation stage (in microsteps)
 
 int homer = 1;      // home the stage
 int renumber = 2;   // renumber all devices in the chain
@@ -115,7 +115,7 @@ long sendCommand(int device, int com, long data)
    unsigned long temp;
    unsigned long repData;
    long replyNeg;
-   byte dumper;
+   byte dumper[1];
    
    // Building the six command bytes
    command[0] = byte(device);
