@@ -17,27 +17,29 @@ byte command[6];
 byte reply[6];
 byte buff[6];
 
-int axisX = 1;    // Device ID of azimuth stage
-int axisY = 2;     // Device ID of elevation stage
+int axisX = 1;    // Device ID of X-axis stage
+int axisY = 2;    // Device ID of Y-axis stage
 
-unsigned long posX = 0;   // Variable which tracks the absolute position of the azimuth stage (in microsteps)
-unsigned long posY = 0;   // Variable which tracks the absolute position of the elevation stage (in microsteps)
+unsigned long posX = 0;   // Variable which tracks the absolute position of the X-axis stage (in microsteps)
+unsigned long posY = 0;   // Variable which tracks the absolute position of the Y-axis stage (in microsteps)
 
 int homer = 1;      // home the stage
 int renumber = 2;   // renumber all devices in the chain
 int moveAbs = 20;   // move absolute
 int moveRel = 21;   // move relative
 int stopMove = 23;  // Stop
-int speedSet = 42;    // Speed to target = 0.00219727(V) degrees/sec (assuming 64 microstep resolution)
+int speedSet = 42;    // Speed to target 
 int getPos = 60;      // Query the device for its position
 int storePos = 16;    // Position can be stored in registers 0 to 15
 int returnPos = 17;   // returns the value (in microsteps) of the position stored in the indicated register
 int move2Pos = 18;    // move to the position stored in the indicated register
 int reset = 0;        // akin to toggling device power
 
-float outData;
+float outData1;
+float outData2;
 long replyData;
-String comm;
+String comm1;
+String comm2;
 
 //On Mega, RX must be one of the following: pin 10-15, 50-53, A8-A15
 int RXPin = 2;
@@ -71,39 +73,29 @@ void setup()
   
   rs232.begin(9600);
   delay(500);
+  replyData = sendCommand(0, 42, 172000);
 
   Serial.println("Zaber linear stage movement test sketch using binary protocol");
-  Serial.println("Enter absolute displacement in mm");
+  Serial.println("Enter absolute displacement in mm for X and Y, separated by a space:");
 }
 
 void loop()
 {
   if(Serial.available() > 0)
   {
-    comm = Serial.readStringUntil('\n');
-    if(comm == "getpos")
+    comm1 = Serial.readStringUntil(' ');
+    comm2 = Serial.readStringUntil('\n');
+    if((comm1 == "getpos") || (comm2 == "getpos"))
     {
       posX = sendCommand(axisX, getPos, 0);
-    }
-    else if(comm == "read")
-    {
-      rs232.readBytes(buff, 6);
-      Serial.print(buff[0]);
-      Serial.print(' ');
-      Serial.print(buff[1]);
-      Serial.print(' ');
-      Serial.print(buff[2]);
-      Serial.print(' ');
-      Serial.print(buff[3]);
-      Serial.print(' ');
-      Serial.print(buff[4]);
-      Serial.print(' ');
-      Serial.println(buff[5]);
+      posY = sendCommand(axisY, getPos, 0);
     }
     else
     {
-      outData = comm.toFloat();
-      replyData = sendCommand(axisX, moveAbs, mm(outData));
+      outData1 = comm1.toFloat();
+      outData2 = comm2.toFloat();
+      replyData = sendCommand(axisX, moveAbs, mm(outData1));
+      replyData = sendCommand(axisY, moveAbs, mm(outData2));
     }
     delay(1000);
   }
@@ -158,10 +150,12 @@ long sendCommand(int device, int com, long data)
    
    repData = (cubed * reply[5]) + (squared * reply[4]) + (256 * reply[3]) + reply[2];
 
-   if(reply[4] == 1)
+   
+   if((reply[4] == 1) || (reply[4] == 2))
    {
      repData += 65536;
    }
+   
    
    if(reply[5] > 127)
    {
