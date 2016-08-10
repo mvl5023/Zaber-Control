@@ -28,7 +28,7 @@ int renumber = 2;   // renumber all devices in the chain
 int moveAbs = 20;   // move absolute
 int moveRel = 21;   // move relative
 int stopMove = 23;  // Stop
-int speedSet = 42;    // Speed to target 
+int speedSet = 42;    // Speed to target = 0.00002906799 * (data) mm/s
 int getPos = 60;      // Query the device for its position
 int storePos = 16;    // Position can be stored in registers 0 to 15
 int returnPos = 17;   // returns the value (in microsteps) of the position stored in the indicated register
@@ -41,7 +41,7 @@ long replyData;
 String comm1;
 String comm2;
 
-//On Mega, RX must be one of the following: pin 10-15, 50-53, A8-A15
+//  On Mega, RX must be one of the following: pin 10-15, 50-53, A8-A15
 int RXPin = 2;
 int TXPin = 3;
 
@@ -73,7 +73,7 @@ void setup()
   
   rs232.begin(9600);
   delay(500);
-  replyData = sendCommand(0, 42, 172000);
+  replyData = sendCommand(0, 42, 172000);       // Set speed to 5 mm/s
 
   Serial.println("Zaber linear stage movement test sketch using binary protocol");
   Serial.println("Enter absolute displacement in mm for X and Y, separated by a space:");
@@ -150,7 +150,7 @@ long sendCommand(int device, int com, long data)
    
    repData = (cubed * reply[5]) + (squared * reply[4]) + (256 * reply[3]) + reply[2];
 
-   
+   // It seems to need this in order to report correct device position
    if((reply[4] == 1) || (reply[4] == 2))
    {
      repData += 65536;
@@ -186,5 +186,3 @@ long sendCommand(int device, int com, long data)
      return repData;
    }    
 }
-
-
