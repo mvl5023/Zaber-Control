@@ -37,6 +37,7 @@ int reset = 0;        // akin to toggling device power
 
 float outData1;
 float outData2;
+float replyFloat;
 long replyData;
 String comm1;
 String comm2;
@@ -87,15 +88,21 @@ void loop()
     comm2 = Serial.readStringUntil('\n');
     if((comm1 == "getpos") || (comm2 == "getpos"))
     {
-      posX = sendCommand(axisX, getPos, 0);
-      posY = sendCommand(axisY, getPos, 0);
+      replyData = sendCommand(axisX, getPos, 0);
+      replyFloat = (pow(256, 3) * float(reply[5])) + (pow(256, 2) * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]);
+      posX = long(replyFloat);
+      Serial.println(posX);
+      replyData = sendCommand(axisY, getPos, 0);
+      replyFloat = (pow(256, 3) * float(reply[5])) + (pow(256, 2) * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]);
+      posY = long(replyFloat);
+      Serial.println(posY);
     }
     else
     {
-      outData1 = comm1.toFloat();
-      outData2 = comm2.toFloat();
-      replyData = sendCommand(axisX, moveAbs, mm(outData1));
-      replyData = sendCommand(axisY, moveAbs, mm(outData2));
+      outData1 = comm1.toInt();
+      outData2 = comm2.toInt();
+      replyData = sendCommand(axisX, moveAbs, outData1);
+      replyData = sendCommand(axisY, moveAbs, outData2);
     }
     delay(1000);
   }
@@ -148,15 +155,21 @@ long sendCommand(int device, int com, long data)
      rs232.readBytes(reply, 6);
    }
    
-   repData = (cubed * reply[5]) + (squared * reply[4]) + (256 * reply[3]) + reply[2];
+   repData = (cubed * int(reply[5])) + (squared * int(reply[4])) + (256 * int(reply[3])) + int(reply[2]);
 
+   /*
    // It seems to need this in order to report correct device position
    if((reply[4] == 1) || (reply[4] == 2))
    {
      repData += 65536;
    }
-   
-   
+   */
+
+   if(device == 1)
+   {
+     repData += 65536;
+   }
+      
    if(reply[5] > 127)
    {
      replyNeg = repData - quad;
@@ -174,15 +187,15 @@ long sendCommand(int device, int com, long data)
    Serial.print(reply[4]);
    Serial.print(' ');
    Serial.println(reply[5]);
-   Serial.print("\tData:");
+   //Serial.print("\tData:");
    if(reply[5] > 127)
    {
-     Serial.println(replyNeg);
+     //Serial.println(replyNeg);
      return replyNeg;
    }
    else
    {
-     Serial.println(repData);  
+     //Serial.println(repData);  
      return repData;
    }    
 }
