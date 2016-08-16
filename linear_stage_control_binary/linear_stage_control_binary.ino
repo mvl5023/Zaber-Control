@@ -88,17 +88,6 @@ void loop()
     comm2 = Serial.readStringUntil('\n');
     if((comm1 == "getpos") || (comm2 == "getpos"))
     {
-      /*
-      replyData = sendCommand(axisX, getPos, 0);
-      replyFloat = (pow(256, 3) * float(reply[5])) + (pow(256, 2) * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]);
-      posX = long(replyFloat);
-      Serial.println(posX);
-      replyData = sendCommand(axisY, getPos, 0);
-      replyFloat = (pow(256, 3) * float(reply[5])) + (pow(256, 2) * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]);
-      posY = long(replyFloat);
-      Serial.println(posY);
-      */
-
       posX = sendCommand(axisX, getPos, 0);
       posY = sendCommand(axisY, getPos, 0);
     }
