@@ -88,6 +88,7 @@ void loop()
     comm2 = Serial.readStringUntil('\n');
     if((comm1 == "getpos") || (comm2 == "getpos"))
     {
+      /*
       replyData = sendCommand(axisX, getPos, 0);
       replyFloat = (pow(256, 3) * float(reply[5])) + (pow(256, 2) * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]);
       posX = long(replyFloat);
@@ -96,6 +97,10 @@ void loop()
       replyFloat = (pow(256, 3) * float(reply[5])) + (pow(256, 2) * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]);
       posY = long(replyFloat);
       Serial.println(posY);
+      */
+
+      posX = sendCommand(axisX, getPos, 0);
+      posY = sendCommand(axisY, getPos, 0);
     }
     else
     {
@@ -114,6 +119,7 @@ long sendCommand(int device, int com, long data)
    unsigned long temp;
    unsigned long repData;
    long replyNeg;
+   float replyFloat;
    byte dumper[1];
    
    // Building the six command bytes
@@ -154,21 +160,9 @@ long sendCommand(int device, int com, long data)
    {
      rs232.readBytes(reply, 6);
    }
-   
-   repData = (cubed * int(reply[5])) + (squared * int(reply[4])) + (256 * int(reply[3])) + int(reply[2]);
 
-   /*
-   // It seems to need this in order to report correct device position
-   if((reply[4] == 1) || (reply[4] == 2))
-   {
-     repData += 65536;
-   }
-   */
-
-   if(device == 1)
-   {
-     repData += 65536;
-   }
+   replyFloat = (cubed * float(reply[5])) + (squared * float(reply[4])) + (256 * float(reply[3])) + float(reply[2]); 
+   repData = long(replyFloat);
       
    if(reply[5] > 127)
    {
@@ -187,15 +181,15 @@ long sendCommand(int device, int com, long data)
    Serial.print(reply[4]);
    Serial.print(' ');
    Serial.println(reply[5]);
-   //Serial.print("\tData:");
+   Serial.print("\tData:");
    if(reply[5] > 127)
    {
-     //Serial.println(replyNeg);
+     Serial.println(replyNeg);
      return replyNeg;
    }
    else
    {
-     //Serial.println(repData);  
+     Serial.println(repData);  
      return repData;
    }    
 }
