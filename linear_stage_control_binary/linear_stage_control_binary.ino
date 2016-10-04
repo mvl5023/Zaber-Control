@@ -43,7 +43,7 @@ String comm1;
 String comm2;
 
 //  On Mega, RX must be one of the following: pin 10-15, 50-53, A8-A15
-int RXPin = 2;
+int RXPin = 10;
 int TXPin = 3;
 
 SoftwareSerial rs232(RXPin, TXPin);   //RX, TX
@@ -74,7 +74,8 @@ void setup()
   
   rs232.begin(9600);
   delay(500);
-  replyData = sendCommand(0, 42, 172000);       // Set speed to 5 mm/s
+  
+  replyData = sendCommand(0, 42, 34402);       // Set speed to 1 mm/s
 
   Serial.println("Zaber linear stage movement test sketch using binary protocol");
   Serial.println("Enter absolute displacement in mm for X and Y, separated by a space:");
